@@ -7,32 +7,35 @@ from django.urls import reverse
 from django.contrib import messages
 from .models import Profile
 from .helper import send_forget_password_mail
-# Create your views here.
+from .models import *
 
-def home(request):
-    return render(request,'home.html')
+
 def loginpage(request):
     if request.method=='POST':
         username=request.POST['username']
         password=request.POST['password']
-        
+      
         if not username or not password:
             messages.success(request,'Both Username and password are required')
             return redirect('/login/')
-        user_obj=User.objects.filter(username=username).first()
-        if user_obj is None:
-            messages.success(request,'User not found.')
-            return redirect('/login/')
-
-        user=authenticate(request,username=username, password=password)
-        
+        # user_obj=User.objects.filter(username=username).first()
+        # if user_obj is None:
+        #     messages.success(request,'User not found.')
+        #     return redirect('/login/')
+        if (User.objects.filter(username=username).exists()):
+            user=authenticate(request,username=username, password=password)
+        else:
+            user=User.objects.get(email=username)
+            print(user)
+            user=authenticate(username=user.username,password=password)
         if user is not None:
             login(request,user)
-            messages.success(request,f"You are logged in as {username}")
-            return redirect("home")
-        
+            # messages.success(request,f"You are logged in as {username}")
+            return redirect('/dashboard/')
         else:
-            messages.success(request,("There was An Error Logging In,Try Again...."))
+            messages.success(request,f"Invaild Credentials")
+           
+
 
     return render(request,'loginpage.html')
 
@@ -56,7 +59,7 @@ def register(request):
                 messages.success(request,'Username is taken.')
                 return redirect('/register/')
             if User.objects.filter(email=email).first():
-                messages.success(request,"Email is taken.")
+                messages.success(request,"Email is aldreay present.")
                 return redirect('/register/')
             
             if password1!=password2:
@@ -65,7 +68,7 @@ def register(request):
             else:
                 data=User.objects.create_user(username=username,email=email,password=password1)
                 data.save()
-                return redirect('login')
+                return redirect('/')
         except Exception as e:
             print(e)
     
@@ -74,16 +77,18 @@ import uuid
 def forget_password(request):
     try:
         if request.method=='POST':
-            username=request.POST.get('username')
-            if not User.objects.filter(username=username).first():
+            # username=request.POST.get('username')
+            email= request.POST.get("email")
+            print(email)
+            # print(username)
+            if not User.objects.filter(email=email).first():
                 messages.success(request,'User not found with this username.')
                 return redirect('/forget-password/')
-            user_obj=User.objects.get(username=username)
+            user_obj=User.objects.get(email=email)
             token=str(uuid.uuid4())
-            Profile_obj=Profile.objects.get(user = user_obj)
-            Profile_obj.forget_password_token=token
-            Profile_obj.save()
-            send_forget_password_mail(user_obj,token)
+            print(user_obj)
+            send_forget_password_mail(email,token)
+            print(token)
             messages.success(request,'An email is sent')
             return redirect('/forget-password/')
 
@@ -103,3 +108,52 @@ def change_password(request,token):
     return render(request,'change-password.html')
 
 # class PasswordChangeView(PasswordChangeView)
+
+
+
+# from django.contrib.auth.tokens import default_token_generator
+# from django.contrib.auth import get_user_model
+# from django.utils import timezone
+# from django.core.signing import TimestampSigner
+
+# def send_reset_password_email(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         user = get_user_model().objects.get(email=email)
+
+#         if user:
+#             # Generate a timestamped token for the user's email
+#             timestamp = int(timezone.now().timestamp())
+#             signer = TimestampSigner()
+#             token = signer.sign_object({'email': email, 'timestamp': timestamp})
+
+#             # Send the email with the reset link
+#             reset_link = f'http://example.com/reset-password/?token={token}'
+#             # Replace 'example.com' with your actual domain name
+#             # Here, you can use Django's email sending mechanism or any third-party library.
+
+#             return HttpResponse('Reset password link sent.')
+
+
+# # views.py
+# from django.core.signing import BadSignature, SignatureExpired
+
+# def reset_password(request):
+#     token = request.GET.get('token')
+#     try:
+#         signer = TimestampSigner()
+#         data = signer.unsign_object(token, max_age=PASSWORD_RESET_TIMEOUT_DAYS * 24 * 3600)
+#         email = data['email']
+#         timestamp = data['timestamp']
+
+#         # Check if the token is expired
+#         if timezone.now().timestamp() - timestamp > PASSWORD_RESET_TIMEOUT_DAYS * 24 * 3600:
+#             return HttpResponse('Reset password link has expired.')
+
+#         # Process the password reset here
+#         # ...
+
+#         return HttpResponse('Password reset successful.')
+
+#     except (BadSignature, SignatureExpired):
+#         return HttpResponse('Invalid reset password link.')

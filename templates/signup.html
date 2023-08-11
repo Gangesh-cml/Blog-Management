@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base1.html' %}
 {% block content %}
-    <h1 class="col-2 mt-5 mx-auto">Sign up</h1>
+    <h1 class="col-3 mx-auto">Sign up</h1>
     <div class="col-3 mx-auto">
       {% if messages %}
           {% for message in messages %}
@@ -10,15 +10,23 @@
           {% endfor %}
       {% endif %}
       </div>
-    <form  class="col-6 mx-auto card p-3 shadow-lg" method="POST">
+    <form  class=" card p-4 shadow-lg" method="POST">
       {% csrf_token %}
+      <div class="form-group">
+        <label for="exampleInputEmail1">First Name</label>
+        <input type="text" name="firstname" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter your FirstName" required>
+      </div>
+      <div class="form-group">
+        <label for="exampleInputEmail1">Last Name</label>
+        <input type="text" name="lastname" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter your LastName" required>
+      </div>
       <div class="form-group">
         <label for="exampleInputEmail1">User Name</label>
         <input type="text" name="username" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter UserName" required>
       </div>
       <div class="form-group">
         <label for="exampleInputEmail1">Email address</label>
-        <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" required>
       </div>
       <div class="form-group">
         <label for="exampleInputPassword1">Password</label>
@@ -30,7 +38,7 @@
       </div>
       
       <button type="submit" class="btn btn-primary">Register</button>
-      <p>Already have an account?<a href="/login/">Sign in</a></p>
+      <p>Already have an account?<a href="/">Sign in</a></p>
     </form>
 
 {% endblock %}

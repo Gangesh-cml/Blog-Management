@@ -5,6 +5,7 @@ def send_forget_password_mail(email,token):
     subject='your forget password link'
     message=f'hi,click on the link to reset your password http://127.0.0.1:8000/change-password/{token}/'
     email_from=settings.EMAIL_HOST_USER
+    print(email_from)
     recipient_list=[email]
-    send_mail(subject,message,email_from,recipient_list)
+    send_mail(subject,message,email_from,[email])
     return True

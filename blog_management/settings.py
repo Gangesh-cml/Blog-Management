@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
+    'blog_post'
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,7 @@ ROOT_URLCONF = 'blog_management.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': ['templates','statics','media'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,23 +75,23 @@ WSGI_APPLICATION = 'blog_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES={
-    'default':{
-        'ENGINE':'django.db.backends.mysql',
-        'NAME':'blog',
-        'HOST':'localhost',
-        'PORT':'3306',
-        'USER':'root',
-        'PASSWORD':'Gangesh12@'
-    }
-}
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+# DATABASES={
+#     'default':{
+#         'ENGINE':'django.db.backends.mysql',
+#         'NAME':'newbd',
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#         'USER':'root',
+#         'PASSWORD':'Gangesh12@'
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
@@ -130,6 +131,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL='blog/'
+MEDIA_ROOT =os.path.join(BASE_DIR,"blog")
+
+STATICFILES_DIRS=[
+    os.path.join(BASE_DIR,'static')
+]
+# STATIC_ROOT=os.path.join(BASE_DIR,'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -137,10 +145,11 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_BACKEND='django.core.mail.backens.smtp.EmailBackend'
+EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST='smtp.gmail.com'
 EMAIL_USE_TLS=True
 EMAIL_PORT=587
 EMAIL_HOST_USER='gangesh.kumar@crossml.com'
-EMAIL_HOST_PASSWORD='Gangesh12@'
+EMAIL_HOST_PASSWORD='ifgxumxwkjiihuwc'
 
+PASSWORD_RESET_TIMEOUT_DAYS = 1
