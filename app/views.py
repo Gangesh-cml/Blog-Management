@@ -68,16 +68,20 @@ def register(request):
             else:
                 data=User.objects.create_user(username=username,email=email,password=password1)
                 data.save()
+                profile_obj=Profile.objects.create(user=data)
+                profile_obj.save()
                 return redirect('/')
         except Exception as e:
             print(e)
     
     return render(request,'signup.html')
+
+
 import uuid
 def forget_password(request):
     try:
         if request.method=='POST':
-            # username=request.POST.get('username')
+            username=request.POST.get('username')
             email= request.POST.get("email")
             print(email)
             # print(username)
@@ -85,7 +89,12 @@ def forget_password(request):
                 messages.success(request,'User not found with this username.')
                 return redirect('/forget-password/')
             user_obj=User.objects.get(email=email)
+            print(user_obj)
             token=str(uuid.uuid4())
+            profile_obj=Profile.objects.get(user=user_obj)
+            print(profile_obj)
+            profile_obj.forget_password_token=token
+            profile_obj.save()
             print(user_obj)
             send_forget_password_mail(email,token)
             print(token)
@@ -99,13 +108,31 @@ def forget_password(request):
 
 def change_password(request,token):
     context={}
-    try:
-        profile_obj=Profile.object.get(forget_password_token=token)
-        print(profile_obj)  
-    except Exception as e:
-        print(e)
+    profile_obj=Profile.objects.filter(forget_password_token=token).first()
+    print(profile_obj)
+    if request.method=='POST':
+        password1=request.POST['password']
+        password2=request.POST['confirm_password']
+        user_id=request.POST.get('user_id')
+        if user_id is None:
+            messages.success(request,"No user id found.")
+            return redirect(f'/changep-passeord/{token}')
+        if password1 != password2:
+            messages.success(request,"both should be equal.")
+            return redirect('/')
+        user_obj=User.objects.get(id=user_id)
+        user_obj.set_password(password1)
+        user_obj.save()
+        return redirect('/login/')
+     
+        
+    context={'user_id':profile_obj.user.id}
+    return render(request,'change-password.html',context)
 
-    return render(request,'change-password.html')
+
+def is_superuser(user):
+    return user.is_superuser
+
 
 # class PasswordChangeView(PasswordChangeView)
 
@@ -157,3 +184,30 @@ def change_password(request,token):
 
 #     except (BadSignature, SignatureExpired):
 #         return HttpResponse('Invalid reset password link.')
+
+
+
+def is_superuser(user):
+    return user.is_superuser
+
+from django.shortcuts import render
+from .forms import AssignPermissionForm
+
+def assign_permission_view(request):
+    if request.method == 'POST':
+        form = AssignPermissionForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data['user']
+            group = form.cleaned_data['group']
+            permissions = form.cleaned_data['permissions']
+
+            if user:
+                user.user_permissions.set(permissions)
+            elif group:
+                group.permissions.set(permissions)
+
+            return render(request, 'success.html')
+    else:
+        form = AssignPermissionForm()
+
+    return render(request, 'assign_permissions.html', {'form': form})
