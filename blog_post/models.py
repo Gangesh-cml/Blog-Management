@@ -10,6 +10,11 @@ class BlogModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     likes=models.ManyToManyField(get_user_model(),related_name='blog_posts')
+    
+    class Meta:
+        permissions = [
+            ("can_edit_or_delete_item", "Can_edit_own or can_delete_own"),
+    ]
 
 
 
