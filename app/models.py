@@ -9,9 +9,12 @@ class Profile(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE)
     forget_password_token=models.CharField(max_length=100)
     created_at=models.DateTimeField(auto_now_add=True) 
-    
+    email_token=models.CharField(max_length=200,default=None,null=True)
+    is_verified= models.BooleanField(default=False)
     def __str__(self):
         return self.user.username
+
+
 
 # from django.contrib.auth.models import AbstractUser
 
@@ -35,8 +38,8 @@ class Profile(models.Model):
 # # Define permissions for regular user role
 # regular_permissions = [
 #     Permission.objects.get(codename='add_post'),
-#     Permission.objects.get(codename='change_own_post'),
-#     Permission.objects.get(codename='delete_own_post'),
+#     Permission.objects.get(codename='change_post'),
+#     Permission.objects.get(codename='delete_post'),
 # ]
     
 # from django.contrib.auth.models import Group
