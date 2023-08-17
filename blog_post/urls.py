@@ -13,6 +13,7 @@ urlpatterns = [
     path('profile/',views.profile,name='profile'),
     path('edit_profile/',views.edit_profile,name='edit_profile'),
     path('know/<id>/',views.know,name='know'),
-    path('likes/<int:pk>/',views.likeview,name='likes')
+    path('likes/<int:pk>/',views.likeview,name='likes'),
+    path('comments/<int:pk>/',views.comments,name='comments')
    
 ]
