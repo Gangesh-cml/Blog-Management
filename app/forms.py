@@ -9,3 +9,5 @@ class AssignPermissionForm(forms.Form):
     user = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
     group = forms.ModelChoiceField(queryset=Group.objects.all(), required=False)
     permissions = forms.ModelMultipleChoiceField(queryset=Permission.objects.all())
+
+
