@@ -1,0 +1,19 @@
+{% extends 'base1.html' %}
+{% block content %}
+    {% csrf_token %}
+    
+    <form class="col-5 mx-auto card p-3 shadow-lg center" method="POST" >
+      {% csrf_token %}
+      <h1 class="form col-0 mx-auto">Assign Permission</h1>
+      <br>
+      {{form}}
+      <br>
+      <button type="submit" class="btn btn-primary">Submit</button><br>
+
+     </form>
+
+{% endblock %}
+
+
+
+
