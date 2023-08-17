@@ -1,6 +1,6 @@
 {% extends 'base1.html' %}
 {% block content %}
-    <h1 class="col-3 mx-auto">Sign up</h1>
+    
     <div class="col-3 mx-auto">
       {% if messages %}
           {% for message in messages %}
@@ -10,8 +10,9 @@
           {% endfor %}
       {% endif %}
       </div>
-    <form  class=" card p-4 shadow-lg" method="POST">
+    <form  class="col-5 mx-auto card p-2 shadow-lg center" method="POST">
       {% csrf_token %}
+      <h1 class="col-0 mx-auto">Sign up</h1>
       <div class="form-group">
         <label for="exampleInputEmail1">First Name</label>
         <input type="text" name="firstname" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter your FirstName" required>
