@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,HttpResponse,HttpResponseRedirect,g
 from django.contrib.auth.models import User,auth
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.views import PasswordChangeView
-
+from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from .models import *
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -25,14 +25,7 @@ def home(request):
     }
     return render(request,'home.html',data)
 
-# @login_required
-# def regular_user(request):
-#     posts=BlogModel.objects.all()
-#     print(posts)
-#     data={
-#         'data':posts
-#     }
-#     return render (request,'regular_user.html',data)
+
 
 @login_required
 def dashboard(request):
@@ -48,10 +41,6 @@ def dashboard1(request):
     current_user=request.user
     user_id=current_user.id
     user_name=current_user.username
-    print(user_name)
-    # queryset=BlogModel.objects.get(author=user_name)
-    # print(queryset.author)
-    # if(user_name==queryset.author or current_user.is_superuser):
     data=User.objects.get(id=user_id)
     data1=BlogModel.objects.filter(author=data)
     print(data1)
@@ -74,7 +63,7 @@ def add_post(request):
         title=request.POST['title']
         content=request.POST['content']
         image=request.POST['image']
-        data=BlogModel.objects.create(title=title,content=content,image=image,author_id=user_id)
+        data=BlogModel.objects.create(title=title,content=content,image=f'blog/{image}',author_id=user_id)
         data.save()
         return redirect('/dashboard/')
 
@@ -116,11 +105,11 @@ def edit_post(request,id):
 
             title=request.POST['title']
             content=request.POST['content']
-            # image=request.POST['image']
+            image=request.POST['image']
 
             queryset.title=title
             queryset.content=content
-            # queryset.image=image
+            queryset.image=f'blog/{image}'
             queryset.save()
             return redirect('/dashboard/')
     else:
@@ -146,13 +135,11 @@ def profile(request):
         Username=request.POST['Username']
         Email=request.POST['Email']
         password=request.POST['password']
-        # slug=request.POST['slug']
-
+    
           
         queryset.title=Username
         queryset.content=Email
 
-        # queryset.slug=slug
         queryset.save()
         return redirect('/dashboard/')
 
@@ -165,7 +152,6 @@ def profile(request):
 def edit_profile(request):
     current_user=request.user
     user_id=current_user.id
-    data=request.current_user.hasp_perm()
     user_name=current_user.username
     user_email=current_user.email
    
@@ -192,10 +178,16 @@ def edit_profile(request):
     return render(request,'update_profile.html',context)
 
 @login_required
+# @permission_required('blog_post.Can_edit_own or can_delete_own')
 def know(request,id):
     queryset=BlogModel.objects.get(id=id)
+    print(queryset)
+    Comment=comment.objects.all()
+    print(Comment)
     context={
-        'data':queryset
+        'data':queryset,
+        'comment':Comment
+
     }
     stuff=get_object_or_404(BlogModel,id=id)
     total_likes=stuff.total_likes()
@@ -209,3 +201,12 @@ def likeview(request,pk):
     post.likes.add(request.user)
     print(post)
     return redirect('/dashboard/')
+
+def comments(request,pk):
+    queryset=BlogModel.objects.get(id=pk)
+    if request.method =='POST':
+        name=request.POST['name']
+        body=request.POST['body']
+        data=comment.objects.create(post=queryset,name=name,body=body)
+        data.save()
+    return render(request,'comment.html')
